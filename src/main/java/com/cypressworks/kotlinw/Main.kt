@@ -35,18 +35,27 @@ private fun newSession(system: RepositorySystem): RepositorySystemSession {
 
 val central = RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build()
 
+val repoSystem = newRepositorySystem()
+val session = newSession(repoSystem)
+
 fun main(args: Array<String>) {
 
-    val repoSystem = newRepositorySystem()
-    val session = newSession(repoSystem)
+    val cpCompiler = getClassPath("kotlin-compiler")
+    val cpStdLib = getClassPath("kotlin-stdlib")
 
-    val artifact = DefaultArtifact("org.jetbrains.kotlin:kotlin-compiler-embeddable:[0,)")
+    val pb = ProcessBuilder(listOf("java", "-jar", cpCompiler,
+            "-classpath", cpStdLib,
+            "-nowarn", "-script") + args)
 
-    val classPath = getClassPath(artifact, repoSystem, session)
-    val pb = ProcessBuilder(listOf("java", "-cp", classPath, "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler", "-script") + args)
     pb.inheritIO()
     println(pb.command().joinToString(separator = " "))
     pb.start().waitFor()
+}
+
+private fun getClassPath(artifactName: String): String {
+    val artifact = DefaultArtifact("org.jetbrains.kotlin:$artifactName:[0,)")
+    val classPath = getClassPath(artifact, repoSystem, session)
+    return classPath
 }
 
 private fun getClassPath(
