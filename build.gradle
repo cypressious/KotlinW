@@ -43,8 +43,8 @@ dependencies {
 
 //noinspection UnnecessaryQualifiedReference
 task proguardJar(type: proguard.gradle.ProGuardTask, dependsOn: jar, group: 'build') {
-    injars project.jar.archivePath.getPath()
-    injars files(configurations.compile)
+    injars project.jar.archivePath
+    injars configurations.compile
 
     libraryjars files(System.getProperty('sun.boot.class.path').split(File.pathSeparator))
 
