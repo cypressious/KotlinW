@@ -64,7 +64,7 @@ object Maven {
 
     private fun newSession(system: RepositorySystem): RepositorySystemSession {
         val session = MavenRepositorySystemUtils.newSession()
-        val localRepo = LocalRepository(File("target/local-repo"))
+        val localRepo = LocalRepository(File(dataDir, "local-repo"))
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo))
         return session
     }
