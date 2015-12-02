@@ -73,5 +73,8 @@ task proguardJar(type: proguard.gradle.ProGuardTask, dependsOn: jar, group: 'bui
 }
 
 task minifiedStartScripts << {
-    new File(minifiedDir, 'kotlinw.bat').write("java -jar $minifiedName %*")
+    new File(minifiedDir, 'kotlinw.bat').write("""@echo off
+java -jar %~dp0\\$minifiedName %*""")
 }
+
+build.dependsOn proguardJar, minifiedStartScripts
