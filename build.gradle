@@ -23,6 +23,9 @@ apply plugin: 'application'
 sourceCompatibility = 1.5
 mainClassName = 'com.cypressworks.kotlinw.MainKt'
 
+def minifiedName = "${project.name}-minified-${project.version}.jar"
+def minifiedDir = "$buildDir/minified-dist/"
+
 jar.manifest.attributes 'Main-Class': mainClassName
 
 dependencies {
@@ -66,5 +69,9 @@ task proguardJar(type: proguard.gradle.ProGuardTask, dependsOn: jar, group: 'bui
     dontoptimize()
 
     //noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
-    outjars new File(libsDir.path, "${project.name}-minified-${project.version}.jar")
+    outjars new File(minifiedDir, minifiedName)
+}
+
+task minifiedStartScripts << {
+    new File(minifiedDir, 'kotlinw.bat').write("java -jar $minifiedName %*")
 }
