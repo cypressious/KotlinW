@@ -5,7 +5,12 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'net.sf.proguard:proguard-gradle:5.2.1'
     }
+}
+
+repositories {
+    jcenter()
 }
 
 version '1.0-SNAPSHOT'
@@ -16,12 +21,9 @@ apply plugin: 'application'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = 1.5
-//noinspection GroovyUnusedAssignment
 mainClassName = 'com.cypressworks.kotlinw.MainKt'
 
-repositories {
-    jcenter()
-}
+jar.manifest.attributes 'Main-Class': mainClassName
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -39,3 +41,30 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
+//noinspection UnnecessaryQualifiedReference
+task proguardJar(type: proguard.gradle.ProGuardTask, dependsOn: jar, group: 'build') {
+    injars project.jar.archivePath.getPath()
+    injars files(configurations.compile)
+
+    libraryjars files(System.getProperty('sun.boot.class.path').split(File.pathSeparator))
+
+    dontwarn 'javax.**'
+    dontwarn 'com.sun.javafx.**'
+    dontwarn 'com.jcraft.jzlib.**'
+    dontwarn 'org.apache.maven.repository.internal.**'
+    dontwarn 'org.eclipse.aether.**'
+    dontwarn 'org.codehaus.plexus.**'
+    dontwarn 'com.google.inject.**'
+
+    keep 'class com.cypressworks.kotlinw.** {*;}'
+    keepclassmembers '''enum * {
+        public static **[] values();
+        public static ** valueOf(java.lang.String);
+    }'''
+
+    dontobfuscate()
+    dontoptimize()
+
+    //noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
+    outjars new File(libsDir.path, "${project.name}-minified-${project.version}.jar")
+}
