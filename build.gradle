@@ -1,16 +1,17 @@
 buildscript {
-    ext.kotlin_version = '1.0.0-beta-2423'
     repositories {
         jcenter()
+        maven { url KOTLIN_REPO }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'net.sf.proguard:proguard-gradle:5.2.1'
+        classpath 'net.sf.proguard:proguard-gradle:5.3.2'
     }
 }
 
 repositories {
     jcenter()
+    maven { url KOTLIN_REPO }
 }
 
 version '1.0-SNAPSHOT'
@@ -30,13 +31,13 @@ jar.manifest.attributes 'Main-Class': mainClassName
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile 'org.eclipse.aether:aether-api:1.0.2.v20150114'
-    compile 'org.eclipse.aether:aether-util:1.0.2.v20150114'
-    compile 'org.eclipse.aether:aether-impl:1.0.2.v20150114'
-    compile 'org.eclipse.aether:aether-connector-basic:1.0.2.v20150114'
-    compile 'org.eclipse.aether:aether-transport-file:1.0.2.v20150114'
-    compile 'org.eclipse.aether:aether-transport-http:1.0.2.v20150114'
-    compile 'org.eclipse.aether:aether-transport-wagon:1.0.2.v20150114'
+    compile "org.eclipse.aether:aether-api:$aether_version"
+    compile "org.eclipse.aether:aether-util:$aether_version"
+    compile "org.eclipse.aether:aether-impl:$aether_version"
+    compile "org.eclipse.aether:aether-connector-basic:$aether_version"
+    compile "org.eclipse.aether:aether-transport-file:$aether_version"
+    compile "org.eclipse.aether:aether-transport-http:$aether_version"
+    compile "org.eclipse.aether:aether-transport-wagon:$aether_version"
     compile 'org.apache.maven:maven-aether-provider:3.3.9'
     compile 'org.apache.maven.wagon:wagon-ssh:1.0'
     compile 'org.slf4j:slf4j-nop:1.7.13'
@@ -72,7 +73,7 @@ task proguardJar(type: proguard.gradle.ProGuardTask, dependsOn: jar, group: 'bui
     outjars new File(minifiedDir, minifiedName)
 }
 
-task minifiedStartScripts << {
+task minifiedStartScripts(dependsOn: proguardJar) << {
     new File(minifiedDir, 'kotlinw.bat').write("""@echo off
 java -jar %~dp0\\$minifiedName %*""")
 }
