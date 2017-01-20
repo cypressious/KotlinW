@@ -19,11 +19,19 @@ import java.io.File
 
 object Maven {
 
+    val defaultVersion = System.getenv("KOTLIN_VERSION") ?: "1.1.0-beta-17"
+
     val repoSystem = newRepositorySystem()!!
     val session = newSession(repoSystem)
     val central = RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build()!!
+    val eap = RemoteRepository.Builder("central", "default", """https://dl.bintray.com/kotlin/kotlin-eap""").build()!!
+    val eap11 = RemoteRepository.Builder("central", "default", """https://dl.bintray.com/kotlin/kotlin-eap-1.1""").build()!!
 
-    fun getClassPath(group: String = "org.jetbrains.kotlin", artifactName: String, version: String = "[0,)"): String {
+    fun getClassPath(
+            group: String = "org.jetbrains.kotlin",
+            artifactName: String,
+            version: String = defaultVersion
+    ): String {
         val artifact = DefaultArtifact("$group:$artifactName:$version")
         val classPath = getClassPath(artifact, repoSystem, session)
         return classPath
@@ -36,13 +44,15 @@ object Maven {
     ): String {
         val dependency = Dependency(artifact, "compile")
         val collectRequest = CollectRequest().apply {
-            setRoot(dependency)
+            root = dependency
             addRepository(central)
+            addRepository(eap)
+            addRepository(eap11)
         }
 
         val node = repoSystem.collectDependencies(session, collectRequest).root
         val dependencyRequest = DependencyRequest().apply {
-            setRoot(node)
+            root = node
         }
 
         repoSystem.resolveDependencies(session, dependencyRequest)
@@ -65,7 +75,7 @@ object Maven {
     private fun newSession(system: RepositorySystem): RepositorySystemSession {
         val session = MavenRepositorySystemUtils.newSession()
         val localRepo = LocalRepository(File(dataDir, "local-repo"))
-        session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo))
+        session.localRepositoryManager = system.newLocalRepositoryManager(session, localRepo)
         return session
     }
 

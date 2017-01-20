@@ -1,13 +1,14 @@
 package com.cypressworks.kotlinw
 
+val cp = listOf("kotlin-stdlib", "kotlin-script-util")
 
 fun main(args: Array<String>) {
 
-    val cpCompiler = Maven.getClassPath(artifactName = "kotlin-compiler", version = "[0,)")
-    val cpStdLib = Maven.getClassPath(artifactName = "kotlin-stdlib", version = "[0,)")
+    val cpCompiler = Maven.getClassPath(artifactName = "kotlin-compiler")
+    val cp = cp.map { Maven.getClassPath(artifactName = it) }
 
     val pb = ProcessBuilder(listOf("java", "-jar", cpCompiler,
-            "-classpath", cpStdLib, "-nowarn", "-script")
+            "-classpath", cp.joinToString(","), "-nowarn", "-script")
             + args)
 
     pb.inheritIO()
