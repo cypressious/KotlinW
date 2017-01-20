@@ -19,9 +19,9 @@ import java.io.File
 
 object Maven {
 
-    val repoSystem = newRepositorySystem()
+    val repoSystem = newRepositorySystem()!!
     val session = newSession(repoSystem)
-    val central = RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build()
+    val central = RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build()!!
 
     fun getClassPath(group: String = "org.jetbrains.kotlin", artifactName: String, version: String = "[0,)"): String {
         val artifact = DefaultArtifact("$group:$artifactName:$version")
