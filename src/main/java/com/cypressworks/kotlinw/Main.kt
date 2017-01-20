@@ -12,6 +12,5 @@ fun main(args: Array<String>) {
             + args)
 
     pb.inheritIO()
-    //    println(pb.command().joinToString(separator = " "))
     pb.start().waitFor()
 }
